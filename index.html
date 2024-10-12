@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوت الدردشة مع الذكاء الاصطناعي</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #800080; /* لون بنفسجي */
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: #ffffff;
+        }
+        .chat-box {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .question, .answer {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .question {
+            background-color: #e0e0e0;
+        }
+        .answer {
+            background-color: #c8e6c9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-box">
+    <h1>بوت الدردشة مع الذكاء الاصطناعي</h1>
+    <div id="chat"></div>
+    <input type="text" id="question" placeholder="اكتب سؤالك هنا" style="width: 100%; padding: 10px;">
+    <button onclick="sendQuestion()" style="width: 100%; padding: 10px; margin-top: 10px;">إرسال</button>
+</div>
+
+<script>
+    function sendQuestion() {
+        const question = document.getElementById("question").value;
+        if (!question) return;
+
+        // إضافة السؤال في واجهة الدردشة
+        const chat = document.getElementById("chat");
+        chat.innerHTML += `<div class="question">سؤال: ${question}</div>`;
+
+        // استدعاء API الذكاء الاصطناعي
+        fetch('https://us-central1-amor-ai.cloudfunctions.net/chatWithGPT', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                data: { messages: [{ role: "user", content: question }] }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const answer = data.result.choices[0].message.content;
+            chat.innerHTML += `<div class="answer">إجابة: ${answer}</div>`;
+        })
+        .catch(error => {
+            chat.innerHTML += `<div class="answer">خطأ في الإتصال: ${error}</div>`;
+        });
+
+        document.getElementById("question").value = ""; // مسح الحقل بعد الإرسال
+    }
+</script>
+
+</body>
+</html>
